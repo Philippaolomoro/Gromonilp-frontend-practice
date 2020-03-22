@@ -1,0 +1,5 @@
+NAME: OLOMORO PHILIPPA OGHENEKARO
+EMAIL: olomoro.philippa@gmail.com
+SLACK USERNAME: Olomoro Philippa
+TRACKS: Front end, Back end, Coding
+COURSES: HTML, CSS, Javascript, nodejs, python
