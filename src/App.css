@@ -1,0 +1,12 @@
+/* fonts */
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@700&display=swap");
+
+/* Header */
+.header {
+	background-color: #30acf2;
+	height: 116px;
+	font-family: "Quicksand", sans-serif;
+}
+.header-h1 {
+	padding-top: 39px;
+}
