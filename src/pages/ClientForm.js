@@ -1,5 +1,21 @@
 import React, { useState } from "react";
 import { Button, Form, FormGroup, Label, Input } from "reactstrap";
+import { CREDENTIALS, SHEET_ID } from '../constants/'
+import { GoogleSpreadsheet	 } from "google-spreadsheet"; 
+
+async function insert(newUser) {
+    const document = new GoogleSpreadsheet(SHEET_ID)
+    await document.useServiceAccountAuth(CREDENTIALS)
+    await document.loadInfo()
+    const sheet = document.sheetsByIndex[1]
+    const rows  = await sheet.getRows()
+    const exists = rows.map(e => e._rawData).filter(e => newUser.email === e[3] || newUser.businessName === e[2])
+    if(exists.length > 0){
+        throw new Error("It seems you have registered for this before, kindly re-check the email and business name if this is not so.")
+	}
+	const result =sheet.addRow(newUser)
+    return await result._rawData
+}
 
 export default function ClientForm() {
 	const [formData, setFormData] = useState({});
@@ -13,27 +29,12 @@ export default function ClientForm() {
 
 	const sendData = async (e) => {
 		e.preventDefault();
-		const { surname, firstname, businessName, email, phone } = formData;
-		try {
-			const response = await fetch(
-				"https://v1.nocodeapi.com/gromoni/google_sheets/zepPTtvVFklAOauc?tabId=Sheet1",
-				{
-					method: "post",
-					body: JSON.stringify([
-						[surname, firstname, businessName, email, phone],
-					]),
-					headers: {
-						"Content-Type": "application/json",
-					},
-				}
-			);
-			const json = await response.json();
-			console.log("Success:", JSON.stringify(json));
-			setMessage("Success");
-		} catch (error) {
-			console.error("Error:", error);
-			setMessage("Error");
-		}
+		const { surname, firstName, businessName, email, phone } = formData;
+		const data = {surname, firstName, businessName, email, phone, dateRegistered: new Date()}
+		await insert(data)
+					.then(_ => setMessage(`Thanks for registering with us ${data.firstName}!, your template is on the way.`))
+					.catch(err => setMessage(err.toString()));
+		
 	};
 
 	return (
@@ -56,7 +57,7 @@ export default function ClientForm() {
 			<FormGroup>
 				<Input
 					type="text"
-					name="firstname"
+					name="firstName"
 					placeholder="First name"
 					onChange={handleInput}
 					required
